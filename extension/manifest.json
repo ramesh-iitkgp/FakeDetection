@@ -1,0 +1,48 @@
+{
+  "manifest_version": 3,
+  "name": "Fake Content Detector",
+  "version": "1.0.0",
+  "description": "Advanced AI-powered detection of deepfakes, manipulated images and synthetic media using multiple AI models",
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "storage",
+    "webRequest",
+    "tabs",
+    "contextMenus"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "background": {
+    "service_worker": "background/service-worker.js"
+  },
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_icon": {
+      "16": "images/icon-16.png",
+      "48": "images/icon-48.png",
+      "128": "images/icon-128.png"
+    },
+    "default_title": "Fake Content Detector"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content/content-script.js"],
+      "run_at": "document_start",
+      "all_frames": true
+    }
+  ],
+  "icons": {
+    "16": "images/icon-16.png",
+    "48": "images/icon-48.png",
+    "128": "images/icon-128.png"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["content/injected-script.js"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}

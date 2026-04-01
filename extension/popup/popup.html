@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fake Content Detector</title>
+    <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="../images/icon-48.png" alt="Logo" class="logo">
+            <h1>Fake Detector</h1>
+            <button id="settings-btn" class="settings-btn" title="Settings">⚙️</button>
+        </div>
+
+        <!-- Main Content -->
+        <div id="main-content" class="main-content">
+            <div class="tabs">
+                <button class="tab-btn active" data-tab="analyze">Quick Scan</button>
+                <button class="tab-btn" data-tab="history">History</button>
+                <button class="tab-btn" data-tab="help">Help</button>
+            </div>
+
+            <!-- Analyze Tab -->
+            <div id="analyze-tab" class="tab-content active">
+                <div class="analyze-section">
+                    <h2>Analyze Media</h2>
+                    
+                    <!-- URL Input -->
+                    <div class="input-group">
+                        <label for="media-url">Image/Video URL:</label>
+                        <div class="input-with-button">
+                            <input 
+                                type="text" 
+                                id="media-url" 
+                                placeholder="Paste image or video URL"
+                                class="url-input"
+                            >
+                            <button id="analyze-url-btn" class="btn btn-primary">Analyze URL</button>
+                        </div>
+                    </div>
+
+                    <!-- File Upload -->
+                    <div class="input-group">
+                        <label for="media-file">Upload Media:</label>
+                        <input 
+                            type="file" 
+                            id="media-file" 
+                            accept="image/*,video/*"
+                            class="file-input"
+                        >
+                        <button id="analyze-file-btn" class="btn btn-primary">Upload & Analyze</button>
+                    </div>
+
+                    <!-- Analyze Page Content -->
+                    <div class="input-group">
+                        <button id="scan-page-btn" class="btn btn-secondary">Scan Page Images</button>
+                        <small>Automatically scan all images on current page</small>
+                    </div>
+
+                    <!-- Analysis Results -->
+                    <div id="results-container" style="display: none;">
+                        <div id="loading-indicator" class="loader">
+                            <div class="spinner"></div>
+                            <p id="loading-text">Analyzing content...</p>
+                        </div>
+
+                        <div id="results-section" style="display: none;">
+                            <h3>Analysis Results</h3>
+                            
+                            <!-- Risk Badge -->
+                            <div class="risk-badge">
+                                <div class="risk-level" id="risk-level">-</div>
+                                <div class="risk-details">
+                                    <h4 id="risk-title">Analyzing...</h4>
+                                    <p id="risk-description">Please wait for results</p>
+                                </div>
+                            </div>
+
+                            <!-- Confidence Meter -->
+                            <div class="confidence-section">
+                                <h4>Confidence Score</h4>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" id="confidence-bar">0%</div>
+                                </div>
+                                <p class="confidence-text" id="confidence-text">-</p>
+                            </div>
+
+                            <!-- Detection Details -->
+                            <div class="details-section">
+                                <h4>Detection Details</h4>
+                                <div id="detection-details" class="details-grid">
+                                    <!-- Populated by JS -->
+                                </div>
+                            </div>
+
+                            <!-- Risk Factors -->
+                            <div id="risk-factors-section" style="display: none;" class="risk-section">
+                                <h4>⚠️ Risk Factors Detected:</h4>
+                                <ul id="risk-factors-list"></ul>
+                            </div>
+
+                            <!-- Actions -->
+                            <div class="action-buttons">
+                                <button id="save-result-btn" class="btn btn-secondary">Save Result</button>
+                                <button id="share-result-btn" class="btn btn-secondary">Share</button>
+                                <button id="view-report-btn" class="btn btn-secondary">Full Report</button>
+                            </div>
+                        </div>
+                        
+                        <button id="new-analysis-btn" class="btn btn-primary" style="display: none; width: 100%;">New Analysis</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- History Tab -->
+            <div id="history-tab" class="tab-content">
+                <h2>Analysis History</h2>
+                <div id="history-list" class="history-list">
+                    <p class="empty-state">No analysis history yet</p>
+                </div>
+                <button id="clear-history-btn" class="btn btn-secondary" style="display: none; width: 100%; margin-top: 10px;">Clear History</button>
+            </div>
+
+            <!-- Help Tab -->
+            <div id="help-tab" class="tab-content">
+                <h2>How it Works</h2>
+                <div class="help-content">
+                    <h3>🔍 Detection Methods</h3>
+                    <ul>
+                        <li><strong>Deepfake Detection:</strong> Identifies AI-generated or swapped faces</li>
+                        <li><strong>Metadata Analysis:</strong> Examines file properties and EXIF data</li>
+                        <li><strong>Compression Analysis:</strong> Detects JPEG artifacts and double compression</li>
+                        <li><strong>Frequency Analysis:</strong> Analyzes frequency domain patterns</li>
+                        <li><strong>Texture Analysis:</strong> Identifies synthetic or manipulated areas</li>
+                    </ul>
+
+                    <h3>⚠️ Risk Levels</h3>
+                    <ul>
+                        <li><span class="risk-badge-inline risk-low">LOW</span> - Likely authentic</li>
+                        <li><span class="risk-badge-inline risk-medium">MEDIUM</span> - Some anomalies detected</li>
+                        <li><span class="risk-badge-inline risk-high">HIGH</span> - Likely manipulated</li>
+                        <li><span class="risk-badge-inline risk-critical">CRITICAL</span> - Very likely fake</li>
+                    </ul>
+
+                    <h3>ℹ️ Tips for Best Results</h3>
+                    <ul>
+                        <li>Upload high-resolution content when possible</li>
+                        <li>For videos, wait for all frames to be analyzed</li>
+                        <li>Compare results with other sources</li>
+                        <li>Note that no detector is 100% accurate</li>
+                    </ul>
+
+                    <h3>🔗 Supported Formats</h3>
+                    <p><strong>Images:</strong> JPEG, PNG, GIF, BMP, WebP</p>
+                    <p><strong>Videos:</strong> MP4, WebM, AVI, MOV</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Panel -->
+        <div id="settings-panel" class="settings-panel" style="display: none;">
+            <h2>Settings</h2>
+            
+            <div class="settings-group">
+                <label>
+                    <input type="checkbox" id="enable-notifications" checked>
+                    Enable notifications
+                </label>
+            </div>
+
+            <div class="settings-group">
+                <label>
+                    <input type="checkbox" id="enable-auto-scan" checked>
+                    Auto-scan images on page load
+                </label>
+            </div>
+
+            <div class="settings-group">
+                <label>
+                    <input type="checkbox" id="enable-context-menu" checked>
+                    Show right-click menu
+                </label>
+            </div>
+
+            <div class="settings-group">
+                <label for="api-endpoint">Backend API Endpoint:</label>
+                <input 
+                    type="text" 
+                    id="api-endpoint" 
+                    placeholder="http://localhost:5000"
+                    class="url-input"
+                >
+            </div>
+
+            <div class="settings-group">
+                <label>
+                    <select id="detection-sensitivity">
+                        <option value="low">Low Sensitivity</option>
+                        <option value="medium" selected>Medium Sensitivity</option>
+                        <option value="high">High Sensitivity</option>
+                    </select>
+                </label>
+            </div>
+
+            <button id="save-settings-btn" class="btn btn-primary" style="width: 100%;">Save Settings</button>
+            <button id="close-settings-btn" class="btn btn-secondary" style="width: 100%; margin-top: 10px;">Close</button>
+        </div>
+    </div>
+
+    <script src="popup.js"></script>
+</body>
+</html>
